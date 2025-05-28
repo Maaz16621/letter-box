@@ -1,12 +1,8 @@
 {
   "header": {
-    "icon": {
-      "name": "Tina",
-      "color": "orange",
-      "style": "float"
-    },
-    "name": "Tina Starter",
-    "color": "default",
+    "logoType": "text",
+    "logoText": "ABC",
+    "color": "primary",
     "nav": [
       {
         "href": "/",
@@ -20,7 +16,10 @@
         "href": "/posts",
         "label": "Blog"
       }
-    ]
+    ],
+    "buttonText": "Contact",
+    "buttonColor": "primary",
+    "buttonLink": "home"
   },
   "footer": {
     "social": [

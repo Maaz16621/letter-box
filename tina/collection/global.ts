@@ -1,7 +1,6 @@
 import type { Collection } from "tinacms";
 import { ColorPickerInput } from "../fields/color";
 import { iconSchema } from "../fields/icon";
-import { icon } from "mermaid/dist/rendering-util/rendering-elements/shapes/icon.js";
 
 const Global: Collection = {
   label: "Global",
@@ -17,11 +16,34 @@ const Global: Collection = {
       label: "Header",
       name: "header",
       fields: [
-        iconSchema as any,
         {
           type: "string",
-          label: "Name",
-          name: "name",
+          label: "Logo Type",
+          name: "logoType",
+          options: [
+            { label: "Text", value: "text" },
+            { label: "Image", value: "image" },
+          ],
+          required: true,
+        },
+       {
+  type: "string",
+  label: "Logo Text",
+  name: "logoText",
+  ui: {
+    // @ts-ignore
+    condition: (formValues) => formValues.logoType === "text",
+  },
+},
+
+        {
+          type: "string",
+          label: "Logo Image URL",
+          name: "logoImage",
+          ui: {
+             // @ts-ignore
+            condition: (formData) => formData.header?.logoType === "image",
+          },
         },
         {
           type: "string",
@@ -38,11 +60,11 @@ const Global: Collection = {
           name: "nav",
           list: true,
           ui: {
-            itemProps: (item) => {
-              return { label: item?.label };
-            },
+            itemProps: (item) => ({
+              label: item?.label,
+            }),
             defaultItem: {
-              href: "home",
+              href: "/",
               label: "Home",
             },
           },
@@ -59,6 +81,29 @@ const Global: Collection = {
             },
           ],
         },
+        {
+          type: "string",
+          label: "Button Text",
+          name: "buttonText",
+          required: false,
+        },
+        {
+          type: "string",
+          label: "Button Color",
+          name: "buttonColor",
+          required: false,
+          options: [
+            { label: "Default", value: "default" },
+            { label: "Primary", value: "primary" },
+            { label: "Secondary", value: "secondary" },
+          ],
+        },
+        {
+          type: "string",
+          label: "Button Link",
+          name: "buttonLink",
+          required: false,
+        },
       ],
     },
     {
@@ -72,9 +117,9 @@ const Global: Collection = {
           name: "social",
           list: true,
           ui: {
-            itemProps: (item) => {
-              return { label: item?.icon?.name || 'undefined' };
-            },
+            itemProps: (item) => ({
+              label: item?.icon?.name || 'undefined',
+            }),
           },
           fields: [
             iconSchema as any,
@@ -91,14 +136,13 @@ const Global: Collection = {
       type: "object",
       label: "Theme",
       name: "theme",
-      // @ts-ignore
       fields: [
         {
           type: "string",
           label: "Primary Color",
           name: "color",
           ui: {
-            component: ColorPickerInput,
+           component: ColorPickerInput as any,
           },
         },
         {
