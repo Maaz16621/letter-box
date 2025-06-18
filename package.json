@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev -c \"next dev --turbopack\"",
-    "build": "tinacms build && next build",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 tinacms dev -c \"next dev --turbopack\"",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 tinacms build && cross-env NODE_OPTIONS=--max-old-space-size=4096 next build",
     "build-local": "tinacms build --local --skip-indexing --skip-cloud-checks && next build",
-    "start": "tinacms build && next start",
+    "start": "cross-env NODE_OPTIONS=--max-old-space-size=4096 tinacms build && next start",
     "export": "npm run build && next export",
     "lint": "biome lint",
     "dev:build": "next build"
@@ -33,6 +33,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.484.0",
     "mermaid": "^11.4.1",

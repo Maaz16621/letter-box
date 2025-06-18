@@ -8,6 +8,11 @@ import { Video } from "./video";
 import { Callout } from "./callout";
 import { Stats } from "./stats";
 import { CallToAction } from "./call-to-action";
+import { OtherSolvers } from "./other-solvers";
+import { TextSection } from "./text-section";
+import { KeyFeatures } from "./keyFeatures";
+import { WhyChoose } from "./whyChoose";
+import { FaqSection } from "./faqSection";
 
 export const Blocks = (props: Omit<Page, "id" | "_sys" | "_values">) => {
   if (!props.blocks) return null;
@@ -42,7 +47,19 @@ const Block = (block: PageBlocks) => {
       return <Testimonial data={block} />;
     case "PageBlocksCta":
       return <CallToAction data={block} />;
-    default:
+    case "PageBlocksOtherSolvers":
+      return <OtherSolvers data={block} />;
+    case "PageBlocksTextSection":
+      return <TextSection data={block} />;
+    case "PageBlocksKeyFeatures": // ✅ NEW BLOCK CASE
+      return <KeyFeatures data={block} />;
+ 
+         case "PageBlocksWhyChoose":
+  return <WhyChoose data={block} />;
+         case "PageBlocksFaq":
+  return <FaqSection data={block} />;
+
+default:
       return null;
   }
 };

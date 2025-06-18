@@ -7,17 +7,31 @@ interface SectionProps extends React.HTMLProps<HTMLElement> {
 }
 
 export const Section: React.FC<SectionProps> = ({ className, children, background, ...props }) => {
+  const isImage = background?.startsWith("http") || background?.startsWith("url(");
+
   return (
-    <div className={background || "bg-default"}>
-      <section
-        className={cn("py-12 mx-auto max-w-7xl px-6", className)}
-        {...props}
-      >
+    <div
+      className={!isImage ? background || "bg-default" : undefined}
+      style={
+        isImage
+          ? {
+              backgroundImage: background?.startsWith("url(")
+                ? background
+                : `url('${background}')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }
+          : undefined
+      }
+    >
+      <section className={cn("mx-auto px-6 py-6 max-w-[1400px]", className)} {...props}>
         {children}
       </section>
     </div>
   );
 };
+
 
 export const tailwindBackgroundOptions = [
   { label: "Default", value: "bg-default" },

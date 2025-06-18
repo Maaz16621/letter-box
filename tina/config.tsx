@@ -6,7 +6,6 @@ import Global from "./collection/global";
 import Author from "./collection/author";
 import Page from "./collection/page";
 import Tag from "./collection/tag";
-import Navbar from "./collection/navbar"; // 👈 Add this import
 const config = defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   branch:
@@ -32,7 +31,7 @@ const config = defineConfig({
     basePath: nextConfig.basePath?.replace(/^\//, '') || '', // The base path of the app (could be /blog)
   },
  schema: {
-  collections: [Page, Post, Author, Tag, Global, Navbar], // 👈 Add Navbar here
+  collections: [Page, Post, Author, Tag, Global], // 👈 Add Navbar here
 },
 });
 

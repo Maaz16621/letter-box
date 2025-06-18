@@ -1,8 +1,8 @@
 {
   "header": {
-    "logoType": "text",
-    "logoText": "ABC",
-    "color": "primary",
+    "logoText": "LETTER BOX SOLVER",
+    "logoImage": "https://assets.tina.io/2c7126f4-363d-43c0-808f-a891b5c8473a/logo/Clip path group.png",
+    "color": "#42CD42",
     "nav": [
       {
         "href": "/",
@@ -18,10 +18,11 @@
       }
     ],
     "buttonText": "Contact",
-    "buttonColor": "primary",
+    "buttonColor": "#42CD42",
     "buttonLink": "home"
   },
   "footer": {
+    "subtext": "Unlock the potential of words at AIWordSolver — your wordhub for solving jumble puzzles, unscrambling letters, and dominating games like Wordle and Scrabble. Elevate your gameplay with our easy-to-use tools!",
     "social": [
       {
         "icon": {
@@ -50,8 +51,8 @@
     ]
   },
   "theme": {
-    "color": "blue",
+    "color": "purple",
     "font": "sans",
-    "darkMode": "light"
+    "darkMode": "dark"
   }
 }

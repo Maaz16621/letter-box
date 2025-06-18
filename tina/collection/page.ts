@@ -7,7 +7,11 @@ import { videoBlockSchema } from '@/components/blocks/video';
 import { calloutBlockSchema } from '@/components/blocks/callout';
 import { statsBlockSchema } from '@/components/blocks/stats';
 import { ctaBlockSchema } from '@/components/blocks/call-to-action';
-
+import { otherSolversBlockSchema } from '@/components/blocks/other-solvers';
+import { textSectionBlockSchema } from '@/components/blocks/text-section';
+import { keyFeaturesBlockSchema } from '@/components/blocks/keyFeatures';
+import { whyChooseBlockSchema } from '@/components/blocks/whyChoose';
+import { faqBlockSchema } from '@/components/blocks/faqSection';
 const Page: Collection = {
   label: 'Pages',
   name: 'page',
@@ -40,6 +44,12 @@ const Page: Collection = {
         contentBlockSchema,
         testimonialBlockSchema,
         videoBlockSchema,
+         otherSolversBlockSchema,
+          textSectionBlockSchema,
+            whyChooseBlockSchema,
+              keyFeaturesBlockSchema,
+              faqBlockSchema,
+              
       ],
     },
   ],

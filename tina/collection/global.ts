@@ -16,44 +16,28 @@ const Global: Collection = {
       label: "Header",
       name: "header",
       fields: [
-        {
-          type: "string",
-          label: "Logo Type",
-          name: "logoType",
-          options: [
-            { label: "Text", value: "text" },
-            { label: "Image", value: "image" },
-          ],
-          required: true,
-        },
-       {
-  type: "string",
-  label: "Logo Text",
-  name: "logoText",
-  ui: {
-    // @ts-ignore
-    condition: (formValues) => formValues.logoType === "text",
+     
+    {
+      type: "string",
+      label: "Logo Text",
+      name: "logoText",
+      required: true,
+    },
+    {
+      type: "string",
+      label: "Logo Image URL",
+      name: "logoImage",
+      required: true,
+    },
+    {
+      type: "string",
+      label: "Color",
+      name: "color",
+        ui: {
+    component: "color",
   },
-},
-
-        {
-          type: "string",
-          label: "Logo Image URL",
-          name: "logoImage",
-          ui: {
-             // @ts-ignore
-            condition: (formData) => formData.header?.logoType === "image",
-          },
-        },
-        {
-          type: "string",
-          label: "Color",
-          name: "color",
-          options: [
-            { label: "Default", value: "default" },
-            { label: "Primary", value: "primary" },
-          ],
-        },
+    },
+  
         {
           type: "object",
           label: "Nav Links",
@@ -92,11 +76,9 @@ const Global: Collection = {
           label: "Button Color",
           name: "buttonColor",
           required: false,
-          options: [
-            { label: "Default", value: "default" },
-            { label: "Primary", value: "primary" },
-            { label: "Secondary", value: "secondary" },
-          ],
+          ui: {
+    component: "color",
+  },
         },
         {
           type: "string",
@@ -111,6 +93,11 @@ const Global: Collection = {
       label: "Footer",
       name: "footer",
       fields: [
+         {
+      type: "string",
+      label: "Subtext",
+      name: "subtext",
+    },
         {
           type: "object",
           label: "Social Links",
