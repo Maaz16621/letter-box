@@ -1,15 +1,10 @@
 {
   "header": {
-<<<<<<< HEAD
-    "logoText": "LETTER BOX SOLVER",
-    "logoImage": "https://assets.tina.io/2c7126f4-363d-43c0-808f-a891b5c8473a/logo/Clip path group.png",
-    "color": "#42CD42",
-=======
+
     "logoType": "text",
     "logoText": "ABC",
     "logoImage": "https://assets.tina.io/2c7126f4-363d-43c0-808f-a891b5c8473a/logo/Clip path group.png",
     "color": "primary",
->>>>>>> 67e821c2ef8ffab513953398a8d65313a44159cb
     "nav": [
       {
         "href": "/",
