@@ -15,7 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v2
         with:
-          path: ./out  # or your actual build output
+          path: ./out  # Change this to your build folder if different
       - uses: actions/deploy-pages@v2
