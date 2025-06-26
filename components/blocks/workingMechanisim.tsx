@@ -134,7 +134,7 @@ export const workingMechanismBlockSchema: Template = {
       label: "Description",
     },
     {
-      type: "object",
+      type: "object" ,
       name: "steps",
       label: "Steps",
       list: true,
