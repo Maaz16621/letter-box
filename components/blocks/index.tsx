@@ -13,6 +13,8 @@ import { TextSection } from "./text-section";
 import { KeyFeatures } from "./keyFeatures";
 import { WhyChoose } from "./whyChoose";
 import { FaqSection } from "./faqSection";
+import { WorkingMechanism } from "./workingMechanisim";
+import { LetterBoxHowTo } from "./howTo";
 
 export const Blocks = (props: Omit<Page, "id" | "_sys" | "_values">) => {
   if (!props.blocks) return null;
@@ -58,7 +60,10 @@ const Block = (block: PageBlocks) => {
   return <WhyChoose data={block} />;
          case "PageBlocksFaq":
   return <FaqSection data={block} />;
-
+case "PageBlocksWorkingMechanism":
+  return <WorkingMechanism data={block} />;
+   case "PageBlocksLetterBoxHowTo":            // 👈 NEW CASE
+      return <LetterBoxHowTo data={block} />;
 default:
       return null;
   }

@@ -12,6 +12,8 @@ import { textSectionBlockSchema } from '@/components/blocks/text-section';
 import { keyFeaturesBlockSchema } from '@/components/blocks/keyFeatures';
 import { whyChooseBlockSchema } from '@/components/blocks/whyChoose';
 import { faqBlockSchema } from '@/components/blocks/faqSection';
+import { workingMechanismBlockSchema } from '@/components/blocks/workingMechanisim';
+import { LetterBoxHowTo, letterBoxHowToBlockSchema } from '@/components/blocks/howTo';
 const Page: Collection = {
   label: 'Pages',
   name: 'page',
@@ -49,6 +51,8 @@ const Page: Collection = {
             whyChooseBlockSchema,
               keyFeaturesBlockSchema,
               faqBlockSchema,
+               workingMechanismBlockSchema,
+               letterBoxHowToBlockSchema,
               
       ],
     },

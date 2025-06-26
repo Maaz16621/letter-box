@@ -276,7 +276,7 @@ const autoFillToday = async () => {
             type="text"
             value={value}
             onChange={(e) => handleInputChange(index, e.target.value)}
-            maxLength="1"
+            maxLength={1}
             className="w-10 h-10 text-center bg-white border border-[#42CD42] rounded-full"
             required
           />
@@ -291,7 +291,7 @@ const autoFillToday = async () => {
             type="text"
             value={value}
             onChange={(e) => handleInputChange(index + 3, e.target.value)}
-            maxLength="1"
+            maxLength={1}
             className="w-10 h-10 text-center bg-white border border-[#42CD42] rounded-full"
             required
           />
@@ -306,7 +306,7 @@ const autoFillToday = async () => {
             type="text"
             value={value}
             onChange={(e) => handleInputChange(index + 6, e.target.value)}
-            maxLength="1"
+            maxLength={1}
             className="w-10 h-10 text-center bg-white border border-[#42CD42] rounded-full"
             required
           />
@@ -321,7 +321,7 @@ const autoFillToday = async () => {
             type="text"
             value={value}
             onChange={(e) => handleInputChange(index + 9, e.target.value)}
-            maxLength="1"
+            maxLength={1}
             className="w-10 h-10 text-center bg-white border border-[#42CD42] rounded-full"
             required
           />
