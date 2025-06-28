@@ -19,7 +19,7 @@
     ],
     "buttonText": "Contact",
     "buttonColor": "#42CD42",
-    "buttonLink": "home"
+    "buttonLink": "/"
   },
   "footer": {
     "subtext": "Unlock the potential of words at AIWordSolver — your wordhub for solving jumble puzzles, unscrambling letters, and dominating games like Wordle and Scrabble. Elevate your gameplay with our easy-to-use tools!",
