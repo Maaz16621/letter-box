@@ -2,27 +2,21 @@
 name: Deploy Next.js site to Cloudways
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches:
-      - main # Or whatever branch Tina Cloud pushes to (e.g., 'master')
-
-  # Allows you to run this workflow manually from the Actions tab
+      - main
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN (good practice)
 permissions:
   contents: read
 
-# Allow only one concurrent deployment
 concurrency:
   group: "cloudways-deploy"
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
-    runs-on: ubuntu-latest # GitHub-hosted runner with ample resources
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,25 +25,18 @@ jobs:
         id: detect-package-manager
         run: |
           if [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "✅ Detected yarn"
             echo "manager=yarn" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=yarn" >> $GITHUB_OUTPUT
-            exit 0
           elif [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
-            echo "✅ Detected pnpm"
             echo "manager=pnpm" >> $GITHUB_OUTPUT
             echo "command=install" >> $GITHUB_OUTPUT
             echo "runner=pnpm" >> $GITHUB_OUTPUT
-            exit 0
           elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "✅ Detected npm"
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-            exit 0
           else
-            echo "❌ Unable to determine package manager"
             exit 1
           fi
 
@@ -59,83 +46,59 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Node.js environment
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc # Uses .nvmrc if present, otherwise specify a version like '18' or '20'
+          node-version-file: .nvmrc
           cache: ${{ steps.detect-package-manager.outputs.manager }}
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-            # You might also want to cache node_modules for faster builds if they are large
-            # node_modules
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}-
 
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      - name: Build Next.js application
+      - name: Build Next.js app
         run: ${{ steps.detect-package-manager.outputs.runner }} build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
           NEXT_PUBLIC_TINA_BRANCH: ${{ github.ref_name }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
-          # Add any other environment variables your Next.js build needs
 
-  # Deployment job to Cloudways
-  deploy_to_cloudways:
+  deploy:
     runs-on: ubuntu-latest
-    needs: build # This job depends on the 'build' job completing successfully
+    needs: build
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 # Need to checkout again in this new job
+        uses: actions/checkout@v4
 
-      - name: Deploy application files to Cloudways via SFTP
-        uses: appleboy/sftp-action@v0.1.4
+      - name: Upload to Cloudways via SFTP
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USERNAME }}
           password: ${{ secrets.CLOUDWAYS_PASSWORD }}
-          port: 22  
+          port: 22
           source: "./"
           target: "/home/master/applications/letterbox/public_html"
-
+          strip_components: 0
+          overwrite: true
+          recursive: true
+          timeout: 300s
           exclude: |
             .git/
             .github/
-            **/.DS_Store
+            .nvmrc
+            README.md
             node_modules/
             src/
-            README.md
-            .nvmrc
 
-      - name: SSH into Cloudways and restart Node.js app
-        uses: appleboy/sftp-action@master
+      - name: Restart Node.js app via SSH
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USERNAME }}
           password: ${{ secrets.CLOUDWAYS_PASSWORD }}
           port: 22
           script: |
-            echo "Navigating to app directory: applications/letterbox/public_html/" # **UPDATED PATH HERE**
-            cd applications/letterbox/public_html/
-
-            # Important: If you chose to exclude node_modules in the FTP-Deploy-Action above,
-            # you must uncomment and run `npm install --production` here.
-            # Otherwise, the Node.js modules are already uploaded with the rest of the app.
-            # echo "Installing production dependencies (if needed)..."
-            # npm install --production
-
-            echo "Restarting Node.js application (tina-app) with PM2..."
-            # Use 'pm2 reload' for graceful restart.
-            # If 'tina-app' isn't already running under PM2, 'pm2 reload' might fail,
-            # so we add a fallback to 'pm2 start' which will start it if it's not running.
-            pm2 reload tina-app || pm2 start npm --name "tina-app" -- start # **UPDATED APP NAME HERE**
-            pm2 save # Saves PM2 process list to ensure it persists across server reboots
-            echo "Application restart command sent for tina-app."
+            cd /home/master/applications/letterbox/public_html
+            pm2 reload tina-app || pm2 start npm --name "tina-app" -- start
+            pm2 save
