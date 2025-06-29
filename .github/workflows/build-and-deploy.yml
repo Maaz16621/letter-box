@@ -12,12 +12,13 @@ concurrency:
   group: cloudways-deploy
   cancel-in-progress: false
 
-#########################
-# 1) BUILD & ARCHIVE
-#########################
+############################
+# 1) BUILD  (GitHub runner)
+############################
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +38,7 @@ jobs:
           node-version-file: .nvmrc
           cache: ${{ steps.pm.outputs.pm }}
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           if [ "${{ steps.pm.outputs.pm }}" = "yarn" ];  then yarn install --immutable;
           elif [ "${{ steps.pm.outputs.pm }}" = "pnpm" ];then pnpm install --frozen-lockfile;
@@ -54,45 +55,44 @@ jobs:
           NEXT_PUBLIC_TINA_BRANCH:   ${{ github.ref_name }}
           TINA_TOKEN:                ${{ secrets.TINA_TOKEN }}
 
-      # ── Archive runtime artefacts
-      - name: Create deploy bundle
+      # Copy build artefacts into deploy/ folder
+      - name: Prepare deploy folder
         run: |
-          tar -czf deploy.tgz \
-            .next \
-            public \
-            package.json \
-            pnpm-lock.yaml
+          rm -rf deploy && mkdir deploy
+          cp -R .next public package.json pnpm-lock.yaml deploy/
+          if [ -d public/admin ]; then
+            mkdir -p deploy/public
+            cp -R public/admin deploy/public/
+          fi
 
+      # Upload as artifact
       - uses: actions/upload-artifact@v4
         with:
-          name: deploy-archive
-          path: deploy.tgz
+          name: deploy-folder
+          path: deploy
 
-#########################
-# 2) DEPLOY (rsync + pm2)
-#########################
+############################
+# 2) DEPLOY (GitHub runner)
+############################
   deploy:
     runs-on: ubuntu-latest
     needs: build
+
     steps:
-      # download build artefact
+      # Download build artefact
       - uses: actions/download-artifact@v4
         with:
-          name: deploy-archive
-          path: .
+          name: deploy-folder
+          path: deploy
 
-      # unpack into ./deploy/
-      - name: Unpack archive
-        run: |
-          mkdir deploy
-          tar -xzf deploy.tgz -C deploy
-
+      # Install tools
       - name: Install rsync & sshpass
         run: sudo apt-get update -y && sudo apt-get install -y rsync sshpass
 
-      # rsync everything that was in the archive
+      # Rsync artefacts to Cloudways
       - name: Rsync to Cloudways
-        env: { SSHPASS: ${{ secrets.CLOUDWAYS_PASSWORD }} }
+        env:
+          SSHPASS: ${{ secrets.CLOUDWAYS_PASSWORD }}
         run: |
           rsync -avz --delete \
             --no-perms --omit-dir-times \
@@ -100,7 +100,7 @@ jobs:
             deploy/ \
             ${{ secrets.CLOUDWAYS_USERNAME }}@${{ secrets.CLOUDWAYS_HOST }}:/home/master/applications/letterbox/public_html/
 
-      # PM2 restart
+      # Reload PM2
       - name: Reload PM2
         uses: appleboy/ssh-action@master
         with:
