@@ -1,2 +1,7 @@
+DirectoryIndex disabled
+Options -MultiViews
 RewriteEngine On
+RewriteBase /
+
+# ✅ Everything else → Node (Next.js running on port 3000)
 RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]

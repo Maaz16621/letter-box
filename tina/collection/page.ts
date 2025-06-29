@@ -13,21 +13,22 @@ import { keyFeaturesBlockSchema } from '@/components/blocks/keyFeatures';
 import { whyChooseBlockSchema } from '@/components/blocks/whyChoose';
 import { faqBlockSchema } from '@/components/blocks/faqSection';
 import { workingMechanismBlockSchema } from '@/components/blocks/workingMechanisim';
-import { LetterBoxHowTo, letterBoxHowToBlockSchema } from '@/components/blocks/howTo';
+import { letterBoxHowToBlockSchema } from '@/components/blocks/howTo';
 const Page: Collection = {
   label: 'Pages',
   name: 'page',
   path: 'content/pages',
   format: 'mdx',
-  ui: {
-    router: ({ document }) => {
-      const filepath = document._sys.breadcrumbs.join('/');
-      if (filepath === 'home') {
-        return '/';
-      }
-      return `/${filepath}`;
-    },
+ui: {
+  router: ({ document }) => {
+    const filepath = document._sys.breadcrumbs.join('/');
+    if (filepath === 'index') {
+      return '/index';   // ← tell Tina the Home page lives at /index now
+    }
+    return `/${filepath}`;
   },
+},
+
   fields: [
     {
       type: 'object',
