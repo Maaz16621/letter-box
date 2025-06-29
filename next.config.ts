@@ -39,10 +39,7 @@ const nextConfig: NextConfig = {
       {
         source: '/admin',
         destination: '/admin/index.html',
-      },
-      { source: '/admin/',      destination: '/admin/index.html' },
-    /* keep every asset static */
-    { source: '/admin/:path*', destination: '/admin/:path*' },
+      }
     ];
   },
 };
