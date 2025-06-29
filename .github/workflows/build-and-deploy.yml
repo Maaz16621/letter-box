@@ -1,9 +1,8 @@
-# Deploy Next.js site to Cloudways
-name: Deploy Next.js site to Cloudways
+name: Build & Deploy to Cloudways
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -13,98 +12,107 @@ concurrency:
   group: cloudways-deploy
   cancel-in-progress: false
 
+#########################
+# 1) BUILD & ARCHIVE
+#########################
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Detect package manager
-        id: detect-package-manager
+      # Detect package manager
+      - id: pm
         run: |
-          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-          elif [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
-            echo "manager=pnpm" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=pnpm" >> $GITHUB_OUTPUT
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-          else
-            echo "❌ No package manager lockfile found" && exit 1
-          fi
+          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT
+          elif [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT
+          else echo "pm=npm" >> $GITHUB_OUTPUT; fi
 
-      - name: Setup pnpm
-        if: steps.detect-package-manager.outputs.manager == 'pnpm'
+      - if: steps.pm.outputs.pm == 'pnpm'
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
+        with: { version: 9 }
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
+          cache: ${{ steps.pm.outputs.pm }}
 
-      - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+      - name: Install deps
+        run: |
+          if [ "${{ steps.pm.outputs.pm }}" = "yarn" ];  then yarn install --immutable;
+          elif [ "${{ steps.pm.outputs.pm }}" = "pnpm" ];then pnpm install --frozen-lockfile;
+          else                                                npm ci; fi
 
-      - name: Build Next.js app
-        run: ${{ steps.detect-package-manager.outputs.runner }} build
+      - name: Build Next.js
+        run: |
+          if [ "${{ steps.pm.outputs.pm }}" = "yarn" ];  then yarn build;
+          elif [ "${{ steps.pm.outputs.pm }}" = "pnpm" ];then pnpm build;
+          else                                                npx --no-install next build; fi
         env:
           NODE_ENV: production
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
-          NEXT_PUBLIC_TINA_BRANCH: ${{ github.ref_name }}
-          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+          NEXT_PUBLIC_TINA_BRANCH:   ${{ github.ref_name }}
+          TINA_TOKEN:                ${{ secrets.TINA_TOKEN }}
 
+      # ── Archive runtime artefacts
+      - name: Create deploy bundle
+        run: |
+          tar -czf deploy.tgz \
+            .next \
+            public \
+            package.json \
+            pnpm-lock.yaml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deploy-archive
+          path: deploy.tgz
+
+#########################
+# 2) DEPLOY (rsync + pm2)
+#########################
   deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # download build artefact
+      - uses: actions/download-artifact@v4
+        with:
+          name: deploy-archive
+          path: .
 
-      - name: Install sshpass & rsync
-        run: sudo apt-get update -y && sudo apt-get install -y sshpass rsync
+      # unpack into ./deploy/
+      - name: Unpack archive
+        run: |
+          mkdir deploy
+          tar -xzf deploy.tgz -C deploy
 
-      - name: Upload all files to Cloudways
-        env:
-          SSHPASS: ${{ secrets.CLOUDWAYS_PASSWORD }}
+      - name: Install rsync & sshpass
+        run: sudo apt-get update -y && sudo apt-get install -y rsync sshpass
+
+      # rsync everything that was in the archive
+      - name: Rsync to Cloudways
+        env: { SSHPASS: ${{ secrets.CLOUDWAYS_PASSWORD }} }
         run: |
           rsync -avz --delete \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'node_modules' \
-            --exclude '.env*' \
             --no-perms --omit-dir-times \
             -e "sshpass -e ssh -o StrictHostKeyChecking=no -p 22" \
-            ./ \
+            deploy/ \
             ${{ secrets.CLOUDWAYS_USERNAME }}@${{ secrets.CLOUDWAYS_HOST }}:/home/master/applications/letterbox/public_html/
 
-      - name: Reload PM2 on Cloudways
+      # PM2 restart
+      - name: Reload PM2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.CLOUDWAYS_HOST }}
-          username: ${{ secrets.CLOUDWAYS_USERNAME }}
-          password: ${{ secrets.CLOUDWAYS_PASSWORD }}
+          host:       ${{ secrets.CLOUDWAYS_HOST }}
+          username:   ${{ secrets.CLOUDWAYS_USERNAME }}
+          password:   ${{ secrets.CLOUDWAYS_PASSWORD }}
           port: 22
           script: |
             export NVM_DIR="$HOME/.nvm"
-            source $NVM_DIR/nvm.sh
-            nvm use 18 || . $HOME/.nvm/nvm.sh && nvm use 18
-
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            nvm use 18
             cd /home/master/applications/letterbox/public_html
-            npm install --omit=dev
-
-            if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
-            fi
-
+            command -v pm2 >/dev/null 2>&1 || npm install -g pm2
             pm2 reload tina-app || pm2 start npm --name "tina-app" -- start
             pm2 save
