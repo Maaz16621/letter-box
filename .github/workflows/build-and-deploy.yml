@@ -1,8 +1,9 @@
+# .github/workflows/deploy-cloudways.yml
 name: Build & Deploy to Cloudways
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -12,96 +13,59 @@ concurrency:
   group: cloudways-deploy
   cancel-in-progress: false
 
-############################
-# 1) BUILD  (GitHub runner)
-############################
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      ############################################################
+      # 1 CHECK OUT CODE & BUILD
+      ############################################################
       - uses: actions/checkout@v4
 
-      # Detect package manager
-      - id: pm
-        run: |
-          if [ -f yarn.lock ]; then echo "pm=yarn" >> $GITHUB_OUTPUT
-          elif [ -f pnpm-lock.yaml ]; then echo "pm=pnpm" >> $GITHUB_OUTPUT
-          else echo "pm=npm" >> $GITHUB_OUTPUT; fi
-
-      - if: steps.pm.outputs.pm == 'pnpm'
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4          # use npm or yarn if you prefer
         with: { version: 9 }
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: ${{ steps.pm.outputs.pm }}
+          cache: pnpm
 
-      - name: Install dependencies
-        run: |
-          if [ "${{ steps.pm.outputs.pm }}" = "yarn" ];  then yarn install --immutable;
-          elif [ "${{ steps.pm.outputs.pm }}" = "pnpm" ];then pnpm install --frozen-lockfile;
-          else                                                npm ci; fi
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
 
       - name: Build Next.js
-        run: |
-          if [ "${{ steps.pm.outputs.pm }}" = "yarn" ];  then yarn build;
-          elif [ "${{ steps.pm.outputs.pm }}" = "pnpm" ];then pnpm build;
-          else                                                npx --no-install next build; fi
+        run: pnpm build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
-          NEXT_PUBLIC_TINA_BRANCH:   ${{ github.ref_name }}
-          TINA_TOKEN:                ${{ secrets.TINA_TOKEN }}
+          NEXT_PUBLIC_TINA_BRANCH: ${{ github.ref_name }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
 
-      # Copy build artefacts into deploy/ folder
-      - name: Prepare deploy folder
-        run: |
-          rm -rf deploy && mkdir deploy
-          cp -R .next public package.json pnpm-lock.yaml deploy/
-          if [ -d public/admin ]; then
-            mkdir -p deploy/public
-            cp -R public/admin deploy/public/
-          fi
-
-      # Upload as artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: deploy-folder
-          path: deploy
-
-############################
-# 2) DEPLOY (GitHub runner)
-############################
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      # Download build artefact
-      - uses: actions/download-artifact@v4
-        with:
-          name: deploy-folder
-          path: deploy
-
-      # Install tools
+      ############################################################
+      # 2 UPLOAD EVERYTHING (INCLUDING .next/) TO CLOUDWAYS
+      ############################################################
       - name: Install rsync & sshpass
         run: sudo apt-get update -y && sudo apt-get install -y rsync sshpass
 
-      # Rsync artefacts to Cloudways
-      - name: Rsync to Cloudways
+      - name: Rsync workspace to Cloudways
         env:
           SSHPASS: ${{ secrets.CLOUDWAYS_PASSWORD }}
         run: |
           rsync -avz --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'node_modules' \
+            --exclude '.env*' \
             --no-perms --omit-dir-times \
             -e "sshpass -e ssh -o StrictHostKeyChecking=no -p 22" \
-            deploy/ \
+            ./ \
             ${{ secrets.CLOUDWAYS_USERNAME }}@${{ secrets.CLOUDWAYS_HOST }}:/home/master/applications/letterbox/public_html/
 
-      # Reload PM2
-      - name: Reload PM2
+      ############################################################
+      # 3 RELOAD PM2
+      ############################################################
+      - name: Reload PM2 on Cloudways
         uses: appleboy/ssh-action@master
         with:
           host:       ${{ secrets.CLOUDWAYS_HOST }}
@@ -113,6 +77,6 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             nvm use 18
             cd /home/master/applications/letterbox/public_html
-            command -v pm2 >/dev/null 2>&1 || npm install -g pm2
+            if ! command -v pm2 >/dev/null 2>&1; then npm install -g pm2; fi
             pm2 reload tina-app || pm2 start npm --name "tina-app" -- start
             pm2 save
