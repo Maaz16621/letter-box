@@ -104,7 +104,7 @@ jobs:
           password: ${{ secrets.CLOUDWAYS_PASSWORD }}
           port: 22 # Standard SFTP/SSH port
           local-dir: './' # Upload the entire project root (which now contains .next, public, etc.)
-          server-dir: 'applications/letterbox/public_html/' # **UPDATED PATH HERE**
+          server-dir: '/home/master/applications/letterbox/public_html/' # **UPDATED PATH HERE**
           # Exclude files that should NOT be uploaded to the server
           exclude: |
             .git*
