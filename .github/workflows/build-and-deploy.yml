@@ -1,35 +1,30 @@
-# Sample workflow for building and deploying a Next.js site to GitHub Pages
-#
-# To get started with Next.js see: https://nextjs.org/docs/getting-started
-#
-name: Deploy Next.js site to Pages
+# Sample workflow for building and deploying a Next.js site to Cloudways
+name: Deploy Next.js site to Cloudways
 
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: [main]
+    branches:
+      - main # Or whatever branch Tina Cloud pushes to (e.g., 'master')
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# Sets permissions of the GITHUB_TOKEN (good practice)
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Allow only one concurrent deployment
 concurrency:
-  group: "pages"
+  group: "cloudways-deploy"
   cancel-in-progress: false
 
 jobs:
   # Build job
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # GitHub-hosted runner with ample resources
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Detect package manager
@@ -64,58 +59,83 @@ jobs:
         with:
           version: 9
 
-      - name: Setup Node
+      - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version-file: .nvmrc # Uses .nvmrc if present, otherwise specify a version like '18' or '20'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
-
-      - name: "Setup Pages #1"
-        run: |
-          touch public/.nojekyll
-      - name: "Setup Pages #2"
-        uses: actions/configure-pages@v5
-        with:
-          # Automatically inject basePath in your Next.js configuration file and disable
-          # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
-          #
-          # You may remove this line if you want to manage the configuration yourself.
-          static_site_generator: next
 
       - name: Restore cache
         uses: actions/cache@v4
         with:
           path: |
             .next/cache
-          # Generate a new cache whenever packages or source files change.
+            # You might also want to cache node_modules for faster builds if they are large
+            # node_modules
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/pnpm-lock.yaml', '**/yarn.lock') }}-
 
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      - name: Build with Next.js
+      - name: Build Next.js application
         run: ${{ steps.detect-package-manager.outputs.runner }} build
         env:
+          NODE_ENV: production
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
           NEXT_PUBLIC_TINA_BRANCH: ${{ github.ref_name }}
           TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+          # Add any other environment variables your Next.js build needs
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./out
-
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # Deployment job to Cloudways
+  deploy_to_cloudways:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build # This job depends on the 'build' job completing successfully
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout code
+        uses: actions/checkout@v4 # Need to checkout again in this new job
+
+      - name: Deploy application files to Cloudways via SFTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.0 # Action for SFTP deployment
+        with:
+          server: ${{ secrets.CLOUDWAYS_HOST }}
+          username: ${{ secrets.CLOUDWAYS_USERNAME }}
+          password: ${{ secrets.CLOUDWAYS_PASSWORD }}
+          port: 22 # Standard SFTP/SSH port
+          local-dir: './' # Upload the entire project root (which now contains .next, public, etc.)
+          server-dir: 'applications/letterbox/public_html/' # **UPDATED PATH HERE**
+          # Exclude files that should NOT be uploaded to the server
+          exclude: |
+            .git*
+            .github*
+            .nvmrc
+            # If you want to install node_modules on the server (after SFTP), uncomment the line below.
+            # Otherwise, they will be uploaded from your built GitHub Actions runner.
+            # node_modules/ 
+            # Add any other files/folders that are not needed on the production server
+
+      - name: SSH into Cloudways and restart Node.js app
+        uses: appleboy/ssh-action@v1.0.0 # Action to execute SSH commands
+        with:
+          host: ${{ secrets.CLOUDWAYS_HOST }}
+          username: ${{ secrets.CLOUDWAYS_USERNAME }}
+          password: ${{ secrets.CLOUDWAYS_PASSWORD }}
+          port: 22
+          script: |
+            echo "Navigating to app directory: applications/letterbox/public_html/" # **UPDATED PATH HERE**
+            cd applications/letterbox/public_html/
+
+            # Important: If you chose to exclude node_modules in the FTP-Deploy-Action above,
+            # you must uncomment and run `npm install --production` here.
+            # Otherwise, the Node.js modules are already uploaded with the rest of the app.
+            # echo "Installing production dependencies (if needed)..."
+            # npm install --production
+
+            echo "Restarting Node.js application (tina-app) with PM2..."
+            # Use 'pm2 reload' for graceful restart.
+            # If 'tina-app' isn't already running under PM2, 'pm2 reload' might fail,
+            # so we add a fallback to 'pm2 start' which will start it if it's not running.
+            pm2 reload tina-app || pm2 start npm --name "tina-app" -- start # **UPDATED APP NAME HERE**
+            pm2 save # Saves PM2 process list to ensure it persists across server reboots
+            echo "Application restart command sent for tina-app."
