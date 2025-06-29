@@ -81,6 +81,7 @@ jobs:
           target: "/home/master/applications/letterbox/public_html"
           strip_components: 0
           overwrite: true
+          tar_dereference: true
           recursive: true
           timeout: 300s
           exclude: |
