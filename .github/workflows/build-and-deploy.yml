@@ -82,15 +82,8 @@ jobs:
           strip_components: 0
           overwrite: true
           tar_dereference: true
-          recursive: true
           timeout: 300s
-          exclude: |
-            .git/
-            .github/
-            .nvmrc
-            README.md
-            node_modules/
-            src/
+          tar_exec: "tar --no-same-permissions --no-same-owner"
 
       - name: Restart Node.js app via SSH
         uses: appleboy/ssh-action@master
