@@ -1,97 +1,53 @@
-# Build on GitHub → notify Cloudways → PM2 reload
-name: Deploy Next.js site to Cloudways
+name: Build and Deploy to Cloudways
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
-concurrency:
-  group: cloudways-deploy
-  cancel-in-progress: false
-
-###############################################################################
 jobs:
-###############################################################################
-
-#######################################
-# 1) BUILD job (runs on GitHub runner)
-#######################################
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Detect package manager
-      - id: detect-pm
-        run: |
-          if [ -f yarn.lock ];       then echo "pm=yarn"  >> $GITHUB_OUTPUT
-          elif [ -f pnpm-lock.yaml ];then echo "pm=pnpm"  >> $GITHUB_OUTPUT
-          else                            echo "pm=npm"   >> $GITHUB_OUTPUT; fi
-
-      # Set up pnpm only if needed
-      - if: steps.detect-pm.outputs.pm == 'pnpm'
-        uses: pnpm/action-setup@v4
-        with: { version: 9 }
-
-      - uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: ${{ steps.detect-pm.outputs.pm }}
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Install dependencies
-        run: |
-          if [ "${{ steps.detect-pm.outputs.pm }}" = "yarn" ];  then yarn install --immutable;
-          elif [ "${{ steps.detect-pm.outputs.pm }}" = "pnpm" ];then pnpm install --frozen-lockfile;
-          else                                                      npm ci; fi
+        run: pnpm install
 
-      - name: Build Next.js app
-        run: |
-          if [ "${{ steps.detect-pm.outputs.pm }}" = "yarn" ];  then yarn build;
-          elif [ "${{ steps.detect-pm.outputs.pm }}" = "pnpm" ];then pnpm build;
-          else                                                      npx --no-install next build; fi
+      - name: Build app
+        run: pnpm build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
-          NEXT_PUBLIC_TINA_BRANCH:   ${{ github.ref_name }}
-          TINA_TOKEN:                ${{ secrets.TINA_TOKEN }}
+          NEXT_PUBLIC_TINA_BRANCH: ${{ github.ref_name }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
 
-#######################################
-# 2) DEPLOY job – call webhook & reload
-#######################################
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      # --- Hit Cloudways Git‑Auto‑Deploy webhook ---
-      - name: Trigger Cloudways pull
-        env:
-          CLOUDWAYS_WEBHOOK: ${{ secrets.CLOUDWAYS_WEBHOOK }}
-        run: |
-          echo "Calling Cloudways webhook …"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$CLOUDWAYS_WEBHOOK")
-          if [ "$STATUS" != "200" ]; then
-            echo "Webhook failed with HTTP $STATUS" && exit 1
-          fi
-          echo "Webhook returned 200 OK"
-
-      # --- (Optional) wait a few seconds so the pull finishes ---
-      - run: sleep 15
-
-      # --- Reload PM2 ---
-      - name: Reload PM2 on Cloudways
+      - name: SSH into Cloudways and pull + restart
         uses: appleboy/ssh-action@master
         with:
-          host:       ${{ secrets.CLOUDWAYS_HOST }}
-          username:   ${{ secrets.CLOUDWAYS_USERNAME }}
-          password:   ${{ secrets.CLOUDWAYS_PASSWORD }}
+          host: ${{ secrets.CLOUDWAYS_HOST }}
+          username: ${{ secrets.CLOUDWAYS_USERNAME }}
+          password: ${{ secrets.CLOUDWAYS_PASSWORD }}  # or use `key` and `passphrase`
           port: 22
           script: |
             cd /home/master/applications/letterbox/public_html
+            git pull origin main
             pm2 reload tina-app || pm2 start npm --name "tina-app" -- start
             pm2 save
