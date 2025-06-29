@@ -116,7 +116,7 @@ jobs:
             .nvmrc
 
       - name: SSH into Cloudways and restart Node.js app
-        uses: appleboy/ssh-action@v1.0.0 # Action to execute SSH commands
+        uses: appleboy/sftp-action@master
         with:
           host: ${{ secrets.CLOUDWAYS_HOST }}
           username: ${{ secrets.CLOUDWAYS_USERNAME }}
