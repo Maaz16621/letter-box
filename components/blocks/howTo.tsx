@@ -1,4 +1,4 @@
-/* LetterBoxHowTo.tsx */
+
 /* LetterBoxHowTo.tsx */
 "use client";
 import { tinaField } from "tinacms/dist/react";
@@ -27,38 +27,33 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
+useEffect(() => {
+  if (isMobile || !pinRef.current || totalSteps < 2) return;
 
-  /* desktop animation */
-  useEffect(() => {
-    if (isMobile || !pinRef.current || totalSteps < 2) return;
+  const st = ScrollTrigger.create({
+    trigger: pinRef.current,
+    start: "center center",
+    end: `+=${window.innerHeight * (totalSteps - 1)}`,
+    pin: true,
+    scrub: true,
+    snap: { snapTo: 1 / (totalSteps - 1), duration: 0.25 },
+    onUpdate: ({ progress }) =>
+      setActive(Math.round(progress * (totalSteps - 1))),
+  });
 
-    const st = ScrollTrigger.create({
-      trigger: pinRef.current,
-      start: "top-=80 top",                       // stick when 30 px from viewport top
-      end: `+=${window.innerHeight * (totalSteps - 1)}`,
-      pin: true,
-      scrub: true,
-      snap: { snapTo: 1 / (totalSteps - 1), duration: 0.25 },
-      onUpdate: ({ progress }) =>
-        setActive(Math.round(progress * (totalSteps - 1))),
-    });
-
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener("resize", refresh);
-    return () => {
-      st.kill();
-      window.removeEventListener("resize", refresh);
-    };
-  }, [isMobile, totalSteps]);
-
+  const refresh = () => ScrollTrigger.refresh();
+  window.addEventListener("resize", refresh);
+  return () => {
+    st.kill();
+    window.removeEventListener("resize", refresh);
+  };
+}, [isMobile, totalSteps]);
   const current = data.steps?.[active] || {};
 
   return (
     <Section background={data?.background}>
-      <div
-        ref={pinRef}
-        className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12"
-      >
+<div ref={pinRef} className="flex items-center justify-center">
+  <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ">
         <h2
           data-tina-field={tinaField(data, "title")}
           className="mb-2 text-center text-2xl font-extrabold sm:text-3xl"
@@ -75,7 +70,7 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
           {data.subtitle}
         </p>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-3">
           {/* step list */}
           <div className="flex flex-col gap-3">
             {data.steps?.map((step: any, idx: number) => {
@@ -129,6 +124,7 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </Section>
   );
