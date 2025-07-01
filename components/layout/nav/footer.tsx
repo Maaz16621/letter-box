@@ -16,7 +16,7 @@ export const Footer = () => {
   ];
 
   return (
-    <footer className="pt-20 px-6 text-white bg-transparent">
+    <footer className="px-6 text-white bg-transparent">
       <div className="max-w-5xl mx-auto px-6 text-center ">
         {/* Logo & Text */}
         <Link href="/" aria-label="Go home" className="inline-flex flex-col items-center mb-4">

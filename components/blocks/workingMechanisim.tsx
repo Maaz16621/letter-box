@@ -3,69 +3,93 @@ import { tinaField } from "tinacms/dist/react";
 import { Section } from "../layout/section";
 import Image from "next/image";
 import CurveImage from "@/public/curve-path.png";
+import React, { useEffect, useState } from "react";
 
 export const WorkingMechanism = ({ data }: { data: any }) => {
   const [firstWord, ...restWords] = (data?.title || "").split(" ");
   const secondPart = restWords.join(" ");
 
+  const [isLarge, setIsLarge] = useState(false);
+  useEffect(() => {
+    const handler = () => setIsLarge(window.innerWidth >= 1024);
+    handler();
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+
   return (
     <Section background={data?.background}>
-      <div className="mx-auto max-w-7xl relative px-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl overflow-visible px-4 sm:px-6 lg:px-8">
 
-        {/* Title */}
         <h2
           data-tina-field={tinaField(data, "title")}
-          className="text-3xl text-center font-bold mb-2"
+          className="mb-2 text-center text-3xl font-bold"
         >
           <span className="text-white">{firstWord} </span>
-          <span className="bg-gradient-to-r from-[#34792C] to-[#67FF56] text-transparent bg-clip-text">
+          <span className="bg-gradient-to-r from-[#34792C] to-[#67FF56] bg-clip-text text-transparent">
             {secondPart}
           </span>
         </h2>
         <p
           data-tina-field={tinaField(data, "description")}
-          className="text-center text-white/80 text-sm mb-10 max-w-xl mx-auto"
+          className="mx-auto mb-10 max-w-xl text-center text-sm text-white/80"
         >
           {data.description}
         </p>
 
-        {/* Curved line image */}
-        <div className="absolute top-1/2 left-0 w-full -z-10 pointer-events-none">
+        <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 lg:block hidden">
           <Image
             src={CurveImage}
             alt="Line path"
             width={1320}
             height={148}
-            className="w-full h-auto"
+            className="h-auto w-full"
+            priority
           />
         </div>
 
-        {/* Steps: 6-column grid – even indices row 1, odd indices row 2 */}
-        <div className="grid grid-cols-6 gap-y-16 gap-x-6">
+        <div
+          className="
+            grid auto-rows-fr
+            grid-cols-1 gap-10
+            sm:grid-cols-2
+            md:grid-cols-3
+            lg:grid-cols-6 lg:gap-x-6 lg:gap-y-16
+          "
+        >
           {data.steps?.map((step: any, index: number) => {
-            const col = index + 1;        // 1-based grid column
-            const row = index % 2 === 0 ? 1 : 2;
+            const placement = isLarge
+              ? { gridColumnStart: index + 1, gridRowStart: index % 2 ? 2 : 1 }
+              : undefined;
 
             return (
               <div
                 key={index}
                 data-tina-field={tinaField(step, "heading")}
-                style={{ gridColumnStart: col, gridRowStart: row }}
+                style={placement}
                 className="flex flex-col items-center text-center"
               >
-                <div className="bg-white/5 w-[120px] h-[120px] flex flex-col justify-center items-center p-4 rounded-xl border border-white/10 hover:border-[#67FF56] transition hover:shadow-lg hover:shadow-[#67FF56]/30">
+                <div
+                  className="
+                    flex aspect-square min-w-[110px] min-h-[110px]
+                    sm:min-w-[120px] sm:min-h-[120px]
+                    flex-col items-center justify-center rounded-xl
+                    border border-white/10 bg-white/5 p-4 transition
+                    hover:border-[#67FF56] hover:shadow-lg hover:shadow-[#67FF56]/30
+                  "
+                >
                   {step.icon && (
                     <img
                       src={step.icon}
                       alt={step.heading}
-                      className="w-8 h-8 mb-2 object-contain"
+                      className="mb-2 h-8 w-8 object-contain"
                     />
                   )}
                 </div>
-                <h3 className="font-semibold text-sm text-white mt-2">
+                <h3 className="mt-2 text-sm font-semibold text-white">
                   {step.heading}
                 </h3>
-                <p className="text-xs text-white/70 mt-1">{step.subtext}</p>
+                <p className="mt-1 text-xs text-white/70">{step.subtext}</p>
               </div>
             );
           })}
