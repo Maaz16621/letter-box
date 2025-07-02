@@ -307,8 +307,25 @@ const autofillToday = async () => {
   {/* Glass Card with Form and Results */}
 <div className="relative z-0 flex items-center justify-center">
   {/* Background Ellipses */}
-  <div className="absolute w-[400px] h-[400px] bg-[#56FF78]/20 rounded-full blur-3xl z-[-1] translate-x-[-20%] translate-y-[10%]"></div>
-  <div className="absolute w-[400px] h-[400px] bg-[#56FF78]/20 rounded-full blur-3xl z-[-1] translate-x-[20%] translate-y-[10%]"></div>
+{/* first ellipse – left */}
+<div
+  className="
+    absolute aspect-square
+    w-[60vw] max-w-[400px]            
+    bg-[#56FF78]/20 rounded-full blur-3xl -z-10
+    -translate-x-1/4  translate-y-[10%]
+  "
+/>
+
+{/* second ellipse – right */}
+<div
+  className="
+    absolute aspect-square
+    w-[60vw] max-w-[400px]
+    bg-[#56FF78]/20 rounded-full blur-3xl -z-10
+    translate-x-1/4  translate-y-[10%]
+  "
+/>
 
 
 <div className="relative mt-6 w-full max-w-6xl mx-auto rounded-3xl bg-white/10 backdrop-blur-lg border border-white/30 shadow-2xl p-8 w-[80%] max-w-[1280px]">
