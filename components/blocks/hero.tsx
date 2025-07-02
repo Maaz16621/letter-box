@@ -389,7 +389,7 @@ const autofillToday = async () => {
        {inputs.slice(0, 3).map((value, i) => (
   <input
     key={i}
-    ref={el => (refs.current[i] = el)}        
+ref={(el) => { refs.current[i] = el }}      
     type="text"
     value={value}
     onChange={e => handleInputChange(i, e.target.value)}
@@ -406,7 +406,7 @@ const autofillToday = async () => {
       {inputs.slice(3, 6).map((value, i) => (
   <input
     key={i + 3}
-    ref={el => (refs.current[i + 3] = el)}
+   ref={(el) => { refs.current[i] = el }}
     type="text"
     value={value}
     onChange={e => handleInputChange(i + 3, e.target.value)}
@@ -423,7 +423,7 @@ const autofillToday = async () => {
        {inputs.slice(6, 9).map((value, i) => (
   <input
     key={i + 6}
-    ref={el => (refs.current[i + 6] = el)}
+ ref={(el) => { refs.current[i] = el }}
     type="text"
     value={value}
     onChange={e => handleInputChange(i + 6, e.target.value)}
@@ -440,7 +440,7 @@ const autofillToday = async () => {
        {inputs.slice(9, 12).map((value, i) => (
   <input
     key={i + 9}
-    ref={el => (refs.current[i + 9] = el)}
+  ref={(el) => { refs.current[i] = el }}
     type="text"
     value={value}
     onChange={e => handleInputChange(i + 9, e.target.value)}
