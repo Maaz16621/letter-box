@@ -1,67 +1,64 @@
 /* utils/formatters.tsx */
 
-const pairRowStyle = `
-  grid grid-cols-[auto_1.5rem_auto] gap-1 items-baseline
-`;
-
-const tripleRowStyle = `
-  grid grid-cols-[auto_1.5rem_auto_1.5rem_auto] gap-1 items-baseline
-`;
+/* shared wrapper – full width, centre‑everything */
+const rowWrap = "w-full flex justify-center items-center gap-2";
 
 export const formatOne = (w: string) => (
-  <div className="text-center">{w}</div>
+  <div className={rowWrap + " text-base sm:text-lg whitespace-nowrap"}>
+    {w}
+  </div>
 );
 
 export const formatPair = (pair: string) => {
   const [w1, w2] = pair.split(" → ");
   return (
-    <div className={pairRowStyle}>
-      {/* Word 1 */}
-      <div className="text-right">
+    <div className={rowWrap + " text-lg sm:text-xl font-semibold leading-tight"}>
+      {/* word 1 */}
+      <span className="text-right">
         {w1.slice(0, -1)}
-        <span className="text-[#67FF56] font-bold">{w1.slice(-1)}</span>
-      </div>
+        <span className="text-[#67FF56]">{w1.slice(-1)}</span>
+      </span>
 
-      {/* Arrow */}
-      <div className="text-center">⟶</div>
+      {/* arrow */}
+      <span className="min-w-[1.5rem] text-center">⟶</span>
 
-      {/* Word 2 */}
-      <div className="text-left">
-        <span className="text-[#67FF56] font-bold">{w2[0]}</span>
+      {/* word 2 */}
+      <span className="text-left">
+        <span className="text-[#67FF56]">{w2[0]}</span>
         {w2.slice(1)}
-      </div>
+      </span>
     </div>
   );
 };
 
-export const formatTriple = (chain: string) => {
-  const [w1, w2, w3] = chain.split(" → ");
+export const formatTriple = (triplet: string) => {
+  const [w1, w2, w3] = triplet.split(" → ");
   return (
-    <div className={tripleRowStyle}>
-      {/* Word 1 */}
-      <div className="text-right">
+    <div className={rowWrap + " text-lg sm:text-xl font-semibold leading-tight"}>
+      {/* w1 */}
+      <span className="text-right whitespace-nowrap">
         {w1.slice(0, -1)}
-        <span className="text-[#67FF56] font-bold">{w1.slice(-1)}</span>
-      </div>
+        <span className="text-[#67FF56]">{w1.slice(-1)}</span>
+      </span>
 
-      {/* Arrow 1 */}
-      <div className="text-center">⟶</div>
+      {/* arrow 1 */}
+      <span className="min-w-[1.5rem] text-center">⟶</span>
 
-      {/* Word 2 */}
-      <div className="text-center">
-        <span className="text-[#67FF56] font-bold">{w2[0]}</span>
+      {/* w2 */}
+      <span className="text-center whitespace-nowrap">
+        <span className="text-[#67FF56]">{w2[0]}</span>
         {w2.slice(1, -1)}
-        <span className="text-[#67FF56] font-bold">{w2.slice(-1)}</span>
-      </div>
+        <span className="text-[#67FF56]">{w2.slice(-1)}</span>
+      </span>
 
-      {/* Arrow 2 */}
-      <div className="text-center">⟶</div>
+      {/* arrow 2 */}
+      <span className="min-w-[1.5rem] text-center">⟶</span>
 
-      {/* Word 3 */}
-      <div className="text-left">
-        <span className="text-[#67FF56] font-bold">{w3[0]}</span>
+      {/* w3 */}
+      <span className="text-left whitespace-nowrap">
+        <span className="text-[#67FF56]">{w3[0]}</span>
         {w3.slice(1)}
-      </div>
+      </span>
     </div>
   );
 };

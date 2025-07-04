@@ -223,15 +223,7 @@ const rowFor = (s: string) => {
 };
 
 
-{/* inside the scroll box */}
-{loading && <p className="text-orange-web text-center">Finding…</p>}
-{!loading && !solutions.length && <p className="text-center">No results yet.</p>}
-{!loading &&
-  solutions
-    .slice(0, 50)
-    .map((s, i) => rowFor(s))
-    .filter(Boolean)
-}
+
 
 
   /* ------------ render solutions box --------------- */
@@ -629,11 +621,20 @@ ref={(el) => { refs.current[i] = el }}
     <p className="text-center">No results yet.</p>
   )}
 
-  {!loading &&
-    solutions
-      .slice(0, 50)          // show up to 50 rows
-      .map((s, i) => rowFor(s))   // ← use the smart formatter
-      .filter(Boolean)}
+{!loading &&
+  solutions.slice(0, 50).map((item, i) => (
+    <div
+      key={i}
+      className={`whitespace-nowrap font-semibold tracking-wide text-[24px] ${
+        solveLevel === 3
+          ? 'three-solution-container'
+          : 'solution-container'
+      }`}
+    >
+      {rowFor(item)}
+    </div>
+  ))}
+
 </div>
 </div>
 

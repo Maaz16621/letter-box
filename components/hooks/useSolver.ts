@@ -1,6 +1,6 @@
 /* hooks/useSolver.ts */
 import { useEffect, useRef, useState } from 'react'
-import SolverWorker from '@/workers/solver.worker.ts'
+import SolverWorker from '../workers/solver.worker'
 
 export function useSolver() {
   const workerRef = useRef<Worker>()
