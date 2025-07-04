@@ -140,3 +140,44 @@
     @apply bg-background text-foreground;
   }
 }
+
+.scroll-box {
+  max-height: 400px; /* Adjust as needed */
+  overflow-y: auto;
+}
+.scroll-box::-webkit-scrollbar {
+  width: 6px;
+  height: 6px; /* Add this line */
+}
+
+.scroll-box::-webkit-scrollbar-thumb {
+  background: linear-gradient(#67FF56, #34792C);
+  border-radius: 4px;
+}
+
+.scroll-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide increment and decrement buttons */
+.scroll-box::-webkit-scrollbar-button:single-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+/* one row: word → arrow → word */
+.pair-row {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;  /* center arrow col is 24 px */
+  align-items: center;                  /* vertical centering */
+  column-gap: 8px;
+  white-space: nowrap;
+}
+.pair-row    { display:grid; grid-template-columns:1fr 24px 1fr;        gap:6px; }
+.triple-row  { display:grid; grid-template-columns:1fr 24px 1fr 24px 1fr;gap:6px; }
+
+
+.arrow {
+  text-align: center;
+  font-weight: 700;
+}

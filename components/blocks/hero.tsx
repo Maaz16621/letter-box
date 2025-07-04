@@ -1,12 +1,13 @@
 'use client';
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { Template } from 'tinacms';
 import { tinaField } from 'tinacms/dist/react';
 import { PageBlocksHero} from '../../tina/__generated__/types';
 import { iconSchema } from '@/tina/fields/icon';
 import { Section, sectionBlockSchemaField } from '../layout/section';
 import { TextEffect } from '../motion-primitives/text-effect';
+import { formatOne, formatPair, formatTriple } from '../utils/formatters'
 const transitionVariants = {
   container: {
     visible: {
@@ -38,6 +39,25 @@ const transitionVariants = {
 export const Hero = ({ data }: { data: PageBlocksHero }) => {
 const [bgClass, setBgClass] = useState("bg-default");
 const [bgImageUrl, setBgImageUrl] = useState("");
+ 
+async function fetchDictionary(): Promise<string[]> {
+  try {
+    const res = await fetch('/sources/new_dic.txt')  // keep leading slash
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const txt = await res.text()
+    return txt
+      .split('\n')
+      .map((w) => w.trim())
+      .filter((w) => w.length >= 3 && w.length <= 12)
+  } catch (err) {
+    console.error('Failed to load dictionary:', err)
+    return []
+  }
+}
+
+  /* ---------------------------------------------------- */
+  /* everything you already have … inputs, refs, handlers */
+  /* ---------------------------------------------------- */
 
 const background = bgImageUrl ? bgImageUrl : bgClass;
   // Extract the background style logic into a more readable format
@@ -54,10 +74,6 @@ const background = bgImageUrl ? bgImageUrl : bgClass;
 const [isLoading, setIsLoading] = useState(false);
 const [solveLevel, setSolveLevel] = useState(1);
 
-const handleSolve = () => {
-  // Replace this with actual solve logic
-  console.log("Solving at level:", solveLevel);
-};
 
 
 const handleClear = () => {
@@ -110,6 +126,8 @@ const [inputs, setInputs] = useState<string[]>(Array(12).fill(''))
     setInputs(Array(12).fill(''))
     focusInput(0)
   }
+
+  useEffect(() => setSolutions([]), [solveLevel]);
 const autofillToday = async () => {
   try {
     const res   = await fetch(
@@ -138,6 +156,92 @@ const autofillToday = async () => {
     alert("Could not fetch today’s puzzle – please try again later.")
   }
 }
+
+const [dictionary, setDictionary] = useState<string[]>([])
+  useEffect(() => { fetchDictionary().then(setDictionary) }, [])
+
+  /* ---------------- web‑worker ---------------- */
+  const workerRef = useRef<Worker>()
+  const [solutions, setSolutions] = useState<string[]>([])
+  const [loading,   setLoading]   = useState(false)
+
+/* ---------- worker wiring (inside useEffect) ---------- */
+useEffect(() => {
+  const w = new Worker(
+    new URL('../workers/solver.worker.ts', import.meta.url),
+    { type: 'module' }
+  )
+  workerRef.current = w
+
+  /* one global handler */
+  w.onmessage = (e) => {
+    console.log("Worker result:", e.data)
+    setSolutions(e.data as string[])
+    setLoading(false)          // ← stop spinner
+  }
+
+  return () => w.terminate()
+}, [])
+
+  /* ---------------- solve button -------------- */
+ /* ---------- solve button ---------- */
+const handleSolve = () => {
+  if (inputs.some((l) => !l)) {
+    alert('Fill all 12 boxes first')
+    return
+  }
+  if (!dictionary.length) {
+    alert('Dictionary still loading, please wait…')
+    return
+  }
+
+  setLoading(true)             // show “Finding…”
+  setSolutions([])             // clear previous run
+
+  workerRef.current?.postMessage({
+    userLetters: inputs,
+    wordLength : solveLevel,   // 1 / 2 / 3
+    dictionary ,
+  })
+}
+
+  /* -------- existing handlers / UI kept as-is -------- */
+/* utils/formatPair.ts */
+const rowFor = (s: string) => {
+  const parts = s.split(' → ');
+
+  if (solveLevel === 1 && parts.length === 1)
+    return <div key={s}>{formatOne(s)}</div>;
+
+  if (solveLevel === 2 && parts.length === 2)
+    return <div key={s}>{formatPair(s)}</div>;
+
+  if (solveLevel === 3 && parts.length === 3)
+    return <div key={s}>{formatTriple(s)}</div>;
+
+  return null; // ignore malformed rows
+};
+
+
+{/* inside the scroll box */}
+{loading && <p className="text-orange-web text-center">Finding…</p>}
+{!loading && !solutions.length && <p className="text-center">No results yet.</p>}
+{!loading &&
+  solutions
+    .slice(0, 50)
+    .map((s, i) => rowFor(s))
+    .filter(Boolean)
+}
+
+
+  /* ------------ render solutions box --------------- */
+
+
+const heading = solveLevel === 1
+  ? 'One‑Word Solutions'
+  : solveLevel === 2
+  ? 'Two‑Word Solutions'
+  : 'Three‑Word Solutions'
 
   return (
     
@@ -211,7 +315,6 @@ const autofillToday = async () => {
       }
 
       .arrow {
-        color: #4a5568;
         font-weight: bold;
       }
 
@@ -328,7 +431,16 @@ const autofillToday = async () => {
 />
 
 
-<div className="relative mt-6 w-full max-w-6xl mx-auto rounded-3xl bg-white/10 backdrop-blur-lg border border-white/30 shadow-2xl p-8 w-[80%] max-w-[1280px]">
+<div
+  className="
+    relative mt-6 mx-auto
+    rounded-3xl bg-white/10 backdrop-blur-lg border border-white/30 shadow-2xl p-8
+    w-auto                 
+    lg:w-[80%]             
+    max-w-[1280px]         
+  "
+>
+
 <div className="hidden lg:block absolute inset-y-0 left-1/2 w-px h-[90%] my-auto -translate-x-1/2 bg-white/30" />
 
   {/* Form + Buttons Column */}
@@ -347,8 +459,8 @@ const autofillToday = async () => {
   onClick={autofillToday}
   className="
     relative overflow-hidden                      
-    px-6 py-2 rounded-[10px]                   
-    text-white font-semibold shadow cursor-pointer
+    px-2 py-2 md:px-6 md:py-2 rounded-[10px]  text-white                  
+    text-sm md:text-base font-semibold shadow cursor-pointer
     bg-gradient-to-r from-[#67FF56] to-[#34792C]  
     transition-all duration-300 ease-in-out
     hover:scale-105 hover:bg-gradient-to-l hover:from-[#34792C] hover:to-[#67FF56]
@@ -455,10 +567,10 @@ ref={(el) => { refs.current[i] = el }}
 
     {/* Buttons */}
 {/* ——— Difficulty + Solve (inline) ——— */}
-<div className="mt-6 flex items-center justify-center gap-3 w-full text-green-400 font-semibold">
+<div className="mt-6 flex flex-wrap items-center justify-center gap-3 w-full text-green-400 font-semibold">
 
   {/* label */}
-  <span>Solve Puzzle In&nbsp;#:</span>
+  <span className="w-full md:w-auto text-center md:text-left">Solve Puzzle In&nbsp;#:</span>
 
   {/* numeric buttons */}
   <div className="flex gap-1 p-1 rounded-full shadow-inner">
@@ -480,13 +592,13 @@ ref={(el) => { refs.current[i] = el }}
     ))}
   </div>
 
-  {/* solve button — same height as number buttons */}
+  {/* solve button */}
   <button
     type="button"
     onClick={handleSolve}
     className="
       cursor-pointer
-      h-9 px-4 rounded-md                        
+      px-4 py-2 rounded-md                        
       bg-green-500 hover:bg-green-600
       text-white text-sm font-semibold
       shadow-md transition
@@ -495,18 +607,36 @@ ref={(el) => { refs.current[i] = el }}
     Solve
   </button>
 </div>
-
-
   </div>
 
   {/* Vertical Divider */}
- <div className="flex-1 text-left text-white max-w-lg mx-auto">
-      <h3 className="text-2xl font-bold mb-4">Solution</h3>
-      <div className="bg-white/20 p-4 rounded-xl shadow-inner space-y-2 text-sm">
-        <p>No results yet.</p>
-        {/* Replace with: results.map((item, idx) => <p key={idx}>{item}</p>) */}
-      </div>
-    </div>
+<div className="flex-1 text-white max-w-lg mx-auto">
+  {/* heading with soft neon outline */}
+  <h3
+    className="
+      text-center text-lg sm:text-xl font-bold mb-4
+      px-4 py-1 rounded-md border border-[#67FF56]/70
+      bg-white/10 backdrop-blur-sm
+    "
+  >
+    {heading}
+  </h3>
+
+  {/* scrollable results */}
+  <div className="scroll-box rounded-xl shadow-inner text-base sm:text-lg space-y-1">
+  {loading && <p className="text-orange-web text-center">Finding…</p>}
+  {!loading && !solutions.length && (
+    <p className="text-center">No results yet.</p>
+  )}
+
+  {!loading &&
+    solutions
+      .slice(0, 50)          // show up to 50 rows
+      .map((s, i) => rowFor(s))   // ← use the smart formatter
+      .filter(Boolean)}
+</div>
+</div>
+
     </div>
     </div>
 </div>
@@ -516,47 +646,10 @@ ref={(el) => { refs.current[i] = el }}
 </Section>
 
   )
+
 };
 
-// const ImageBlock = ({ image }: { image: PageBlocksHeroImage }) => {
 
-//   if (image.videoUrl) {
-
-//     let videoId = '';
-//     if (image.videoUrl) {
-//       const embedPrefix = '/embed/';
-//       const idx = image.videoUrl.indexOf(embedPrefix);
-//       if (idx !== -1) {
-//         videoId = image.videoUrl.substring(idx + embedPrefix.length).split('?')[0];
-//       }
-//     }
-//     const thumbnailSrc = image.src
-//       ? image.src!
-//       : videoId
-//         ? `https://i3.ytimg.com/vi/${videoId}/maxresdefault.jpg`
-//         : '';
-
-//     return (
-//       <HeroVideoDialog
-//         videoSrc={image.videoUrl}
-//         thumbnailSrc={thumbnailSrc}
-//         thumbnailAlt="Hero Video"
-//       />
-//     )
-//   }
-
-//   if (image.src) {
-//     return (
-//       <Image
-//         className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border max-w-full h-auto"
-//         alt={image!.alt || ''}
-//         src={image!.src!}
-//         height={4000}
-//         width={3000}
-//       />
-//     )
-//   }
-// }
 
 export const heroBlockSchema: Template = {
   name: 'hero',
