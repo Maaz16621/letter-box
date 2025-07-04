@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-     "types": ["webworker"],
     "lib": [
       "dom",
       "dom.iterable",
