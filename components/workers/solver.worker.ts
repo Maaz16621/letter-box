@@ -33,8 +33,10 @@ self.onmessage = async function (event) {
 
     self.postMessage(solutions);
 };
+type TrieNode = { [ch: string]: TrieNode } & { isWord?: boolean };
 
-const trie = {};
+// root of the trie
+const trie: TrieNode = {};
 
 // Build Trie from dictionary
 function buildTrie(dictionary) {
@@ -69,7 +71,8 @@ function canFormWord(targetWord, availableLetters) {
 }
 
 async function findTwelveLetterWords(userLetters, dictionary) {
-    const validTwelveLetterWords = [];
+
+const validTwelveLetterWords: string[] = [];   // ✅
 
     for (const word of dictionary) {
         if (word.length === 12 && canFormTwelveLetterWord(word.toUpperCase(), userLetters)) {
@@ -104,7 +107,7 @@ function groupLetters(userLetters) {
         return letterGroupsCache.get(cacheKey);
     }
 
-    const groups = [];
+const groups: string[][] = []; 
     for (let i = 0; i < userLetters.length; i += 3) {
         groups.push(userLetters.slice(i, i + 3));
     }
@@ -131,7 +134,7 @@ function hasNoAdjacentSameGroup(word, letterGroups) {
 
 async function findTwoWordSolutions(userLetters, dictionary) {
     const validWords = await findValidWords(userLetters, dictionary);
-    const pairedWords = new Set();
+    const pairedWords = new Set<string>();  
     const letterGroups = groupLetters(userLetters);
     
     await Promise.all(
