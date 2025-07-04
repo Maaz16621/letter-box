@@ -1,4 +1,7 @@
+
+/// <reference lib="webworker" />
 export default {} // ← keeps TS happy; actual code is below
+
 if (typeof self !== 'undefined') {
   const ctx: DedicatedWorkerGlobalScope = self as any
 self.onmessage = async function (event) {
