@@ -24,10 +24,7 @@ const lato = Lato({
   weight: "400",
 });
 
-export const metadata: Metadata = {
-  title: "Tina",
-  description: "Tina Cloud Starter",
-};
+
 
 export default function RootLayout({
   children,

@@ -427,8 +427,8 @@ const heading = solveLevel === 1
   className="
     relative mt-6 mx-auto
     rounded-3xl bg-white/10 backdrop-blur-lg border border-white/30 shadow-2xl p-8
-    w-auto                 
-    lg:w-[80%]             
+    w-[100%]                 
+                 
     max-w-[1280px]         
   "
 >
