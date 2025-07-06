@@ -50,10 +50,17 @@ useEffect(() => {
 }, [isMobile, totalSteps]);
   const current = data.steps?.[active] || {};
 
-  return (
-    <Section background={data?.background}>
-<div ref={pinRef} className="flex items-center justify-center">
-  <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ">
+ return (
+  <Section background={data?.background}>
+    <div ref={pinRef} className="relative flex items-center justify-center ">
+      {/* ⬇️ Spotlights */}
+ 
+        <div className="absolute top-1/4 right-0 w-72 h-72 bg-[#67FF56]/20 rounded-full blur-3xl md:w-96 md:h-96 z-10" />
+        <div className="absolute top-1/4 left-0 w-72 h-72 bg-[#67FF56]/15 rounded-full blur-3xl md:w-96 md:h-96 z-10" />
+      
+
+      {/* ⬇️ Main content */}
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2
           data-tina-field={tinaField(data, "title")}
           className="mb-2 text-center text-2xl font-extrabold sm:text-3xl"
@@ -63,6 +70,7 @@ useEffect(() => {
             {secondPart}
           </span>
         </h2>
+
         <p
           data-tina-field={tinaField(data, "subtitle")}
           className="mx-auto mb-10 max-w-2xl text-center text-sm text-white/80"
@@ -71,7 +79,7 @@ useEffect(() => {
         </p>
 
         <div className="grid gap-8 md:grid-cols-3">
-          {/* step list */}
+          {/* Steps */}
           <div className="flex flex-col gap-3">
             {data.steps?.map((step: any, idx: number) => {
               const clickProps = isMobile ? { onClick: () => setActive(idx) } : {};
@@ -80,14 +88,12 @@ useEffect(() => {
                   key={idx}
                   {...clickProps}
                   data-tina-field={tinaField(step, "label")}
-                  className={`
-                    flex cursor-pointer items-center gap-3 rounded-md border p-3 transition
+                  className={`flex cursor-pointer items-center gap-3 rounded-md border p-3 transition
                     ${
                       idx === active
                         ? "border-[#67FF56]/70 bg-white/5 shadow-[0_0_10px_rgba(103,255,86,0.4)]"
                         : "border-white/10 bg-white/5 hover:border-[#67FF56]/50"
-                    }
-                  `}
+                    }`}
                 >
                   <span className="flex h-7 w-7 items-center justify-center rounded bg-[#1A1C23] text-xs font-semibold text-white border border-white/20">
                     {idx + 1}
@@ -98,7 +104,7 @@ useEffect(() => {
             })}
           </div>
 
-          {/* description */}
+          {/* Description */}
           <div className="rounded-xl bg-white/5 border border-white/10 p-6 text-sm leading-relaxed text-white/80">
             {current.label && (
               <h3 className="mb-2 text-base font-semibold text-white">
@@ -108,7 +114,7 @@ useEffect(() => {
             {current.text}
           </div>
 
-          {/* image */}
+          {/* Image */}
           <div className="flex justify-center lg:justify-end">
             <div className="w-full rounded-2xl bg-white/5 border border-white/10 p-4">
               {current.image && (
@@ -125,9 +131,10 @@ useEffect(() => {
           </div>
         </div>
       </div>
-      </div>
-    </Section>
-  );
+    </div>
+  </Section>
+);
+
 };
 
 
