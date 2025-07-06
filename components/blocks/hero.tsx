@@ -263,35 +263,9 @@ const heading = solveLevel === 1
         background:antiquewhite;
         }
 
-      .solution-container {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        font-size: 1.5rem;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
+  
 
-      .three-solution-container {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr auto 1fr;
-        font-size: 1.5rem;
-        gap: 2px;
-        margin-bottom: 8px;
-      }
-
-      @media (max-width: 450px) {
-        .solution-container,
-        .three-solution-container {
-          font-size: 1.2rem;
-        }
-      }
-
-      @media (max-width: 700px) {
-        .three-solution-container {
-          font-size: 1.2rem;
-        }
-      }
-
+     
       .word-middle {
         text-align: center;
         white-space: nowrap;
@@ -615,7 +589,7 @@ ref={(el) => { refs.current[i] = el }}
   </h3>
 
   {/* scrollable results */}
-  <div className="scroll-box rounded-xl shadow-inner text-base sm:text-lg space-y-1">
+  <div className="scroll-box  shadow-inner text-base sm:text-lg space-y-1">
   {loading && <p className="text-orange-web text-center">Finding…</p>}
   {!loading && !solutions.length && (
     <p className="text-center">No results yet.</p>
@@ -625,11 +599,7 @@ ref={(el) => { refs.current[i] = el }}
   solutions.slice(0, 50).map((item, i) => (
     <div
       key={i}
-      className={`whitespace-nowrap font-semibold tracking-wide text-[24px] ${
-        solveLevel === 3
-          ? 'three-solution-container'
-          : 'solution-container'
-      }`}
+      className={`whitespace-nowrap font-semibold tracking-wide `}
     >
       {rowFor(item)}
     </div>

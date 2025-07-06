@@ -12,9 +12,22 @@ export const FaqSection = ({ data }: { data: any }) => {
 
   return (
 <Section background={data?.background}>
-  <div
-  className="absolute left-1/2 translate-x-[-50%] translate-y-[50%] w-[400px] h-[400px] bg-[#56FF78]/20 rounded-full blur-3xl z-[-1]"
-></div>
+ <div
+  className="
+    absolute left-1/2 translate-x-[-50%] translate-y-[50%]
+
+    w-[70vw] h-[70vw]          
+    max-w-[300px] max-h-[300px] 
+
+    
+    sm:w-[360px] sm:h-[360px]    
+    md:w-[400px] md:h-[400px]    
+
+    bg-[#56FF78]/20 rounded-full blur-3xl
+    -z-10                     
+  "
+/>
+
   <div className="  mx-auto text-white">
     <h2 className="text-center text-3xl font-bold mb-8" data-tina-field={tinaField(data, "title")}>
       {data.title}
