@@ -31,7 +31,7 @@ export const Header = () => {
         />
       )}
 
-      <header className="absolute z-40 top-8 left-1/2 -translate-x-1/2 w-[80vw]">
+      <header className="absolute z-40 top-8 left-1/2 -translate-x-1/2 w-[100%] max-w-[1280] px-6 lg:px-[110px]">
         <nav className="relative border rounded-lg border-white/30 shadow-lg">
           {/* glassy background */}
           <div aria-hidden className="absolute inset-0 rounded-lg bg-white/10" />
@@ -45,8 +45,8 @@ export const Header = () => {
               className="p-2 md:pointer-events-none"
             >
               <svg
-                width="48"
-                height="48"
+                width="36"
+                height="36"
                 viewBox="0 0 48 48"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"

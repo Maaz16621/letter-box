@@ -5,10 +5,12 @@ import { tinaField } from "tinacms/dist/react";
 import { Section } from "../layout/section";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
+gsap.registerPlugin(ScrollTrigger);
+
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export const LetterBoxHowTo = ({ data }: { data: any }) => {
   const [first, ...rest] = (data?.title || "").split(" ");
@@ -20,6 +22,18 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
 
   const pinRef = useRef<HTMLDivElement>(null);
 
+  // Scroll to a specific step (desktop only)
+  const scrollToStep = (idx: number) => {
+    if (!pinRef.current || isMobile) return;
+    const st = ScrollTrigger.getById("howto-scroll");
+    if (st) {
+      const start = st.start;
+      const end = st.end;
+      const targetScroll = start + ((end - start) * (idx / (totalSteps - 1)));
+      gsap.to(window, { scrollTo: targetScroll, duration: 0.7, ease: "power2.inOut" });
+    }
+  };
+
   /* toggle mobile */
   useEffect(() => {
     const resize = () => setIsMobile(window.innerWidth < 768);
@@ -27,27 +41,30 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, []);
-useEffect(() => {
-  if (isMobile || !pinRef.current || totalSteps < 2) return;
 
-  const st = ScrollTrigger.create({
-    trigger: pinRef.current,
-    start: "center center",
-    end: `+=${window.innerHeight * (totalSteps - 1)}`,
-    pin: true,
-    scrub: true,
-    snap: { snapTo: 1 / (totalSteps - 1), duration: 0.25 },
-    onUpdate: ({ progress }) =>
-      setActive(Math.round(progress * (totalSteps - 1))),
-  });
+  useEffect(() => {
+    if (isMobile || !pinRef.current || totalSteps < 2) return;
 
-  const refresh = () => ScrollTrigger.refresh();
-  window.addEventListener("resize", refresh);
-  return () => {
-    st.kill();
-    window.removeEventListener("resize", refresh);
-  };
-}, [isMobile, totalSteps]);
+    const st = ScrollTrigger.create({
+      id: "howto-scroll",
+      trigger: pinRef.current,
+      start: "center center",
+      end: `+=${window.innerHeight * (totalSteps - 1)}`,
+      pin: true,
+      scrub: true,
+      snap: { snapTo: 1 / (totalSteps - 1), duration: 0.25 },
+      onUpdate: ({ progress }) =>
+        setActive(Math.round(progress * (totalSteps - 1))),
+    });
+
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", refresh);
+    return () => {
+      st.kill();
+      window.removeEventListener("resize", refresh);
+    };
+  }, [isMobile, totalSteps]);
+
   const current = data.steps?.[active] || {};
 
  return (
@@ -82,7 +99,9 @@ useEffect(() => {
           {/* Steps */}
           <div className="flex flex-col gap-3">
             {data.steps?.map((step: any, idx: number) => {
-              const clickProps = isMobile ? { onClick: () => setActive(idx) } : {};
+              const clickProps = isMobile
+                ? { onClick: () => setActive(idx) }
+                : { onClick: () => scrollToStep(idx) };
               return (
                 <div
                   key={idx}
