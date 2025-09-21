@@ -72,7 +72,7 @@ const background = bgImageUrl ? bgImageUrl : bgClass;
   }
 
 const [isLoading, setIsLoading] = useState(false);
-const [solveLevel, setSolveLevel] = useState(1);
+const [solveLevel, setSolveLevel] = useState(2);
 
 
 
