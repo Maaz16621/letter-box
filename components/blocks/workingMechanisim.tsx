@@ -48,16 +48,19 @@ export const WorkingMechanism = ({ data }: { data: any }) => {
           "
         >
           {data.steps?.map((step: any, index: number) => {
+            const isSecondRow = Math.floor(index / 2) === 1;
             return (
               <div
                 key={index}
                 data-tina-field={tinaField(step, "heading")}
-                className="flex flex-col items-center text-center"
+                className={`flex flex-col items-center text-center ${
+                  isSecondRow ? "lg:translate-x-20" : ""
+                }`}
               >
                 <div
                   className="
-                    flex aspect-square min-w-[110px] min-h-[110px]
-                    sm:min-w-[120px] sm:min-h-[120px]
+                    flex aspect-square min-w-[100px] min-h-[100px]
+                    sm:min-w-[110px] sm:min-h-[110px]
                     flex-col items-center justify-center rounded-xl
                     border border-white/10 bg-white/5 p-4 transition
                     hover:border-[#67FF56] hover:shadow-lg hover:shadow-[#67FF56]/30
