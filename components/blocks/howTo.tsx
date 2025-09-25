@@ -77,7 +77,7 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
       
 
       {/* ⬇️ Main content */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto w-full max-w-9xl px-4 sm:px-6 lg:px-8">
         <h2
           data-tina-field={tinaField(data, "title")}
           className="mb-2 text-center text-2xl font-extrabold sm:text-3xl"
@@ -135,7 +135,7 @@ export const LetterBoxHowTo = ({ data }: { data: any }) => {
 
           {/* Image */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-full rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div className="w-full rounded-2xl bg-white/5 border border-white/10 p-4 flex items-center justify-center">
               {current.image && (
                 <Image
                   src={current.image}

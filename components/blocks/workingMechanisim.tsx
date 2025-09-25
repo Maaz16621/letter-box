@@ -9,14 +9,6 @@ export const WorkingMechanism = ({ data }: { data: any }) => {
   const [firstWord, ...restWords] = (data?.title || "").split(" ");
   const secondPart = restWords.join(" ");
 
-  const [isLarge, setIsLarge] = useState(false);
-  useEffect(() => {
-    const handler = () => setIsLarge(window.innerWidth >= 1024);
-    handler();
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-
   return (
     <Section background={data?.background}>
       <div className="relative mx-auto max-w-7xl overflow-visible px-4 sm:px-6 lg:px-8">
@@ -53,20 +45,13 @@ export const WorkingMechanism = ({ data }: { data: any }) => {
             grid auto-rows-fr
             grid-cols-1 gap-10
             sm:grid-cols-2
-            md:grid-cols-3
-            lg:grid-cols-6 lg:gap-x-6 lg:gap-y-16
           "
         >
           {data.steps?.map((step: any, index: number) => {
-            const placement = isLarge
-              ? { gridColumnStart: index + 1, gridRowStart: index % 2 ? 2 : 1 }
-              : undefined;
-
             return (
               <div
                 key={index}
                 data-tina-field={tinaField(step, "heading")}
-                style={placement}
                 className="flex flex-col items-center text-center"
               >
                 <div
