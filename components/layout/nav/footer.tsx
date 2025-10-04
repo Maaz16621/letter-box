@@ -35,6 +35,7 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
+
               <Icon
                 data={{ ...link!.icon, size: "small" }}
                 className="w-4 h-4 text-white hover:text-[#67FF56] transition-colors duration-200"
@@ -58,10 +59,10 @@ export const Footer = () => {
             {footer?.pages?.map((page, index) => (
               <Link
                 key={index}
-                href={page.href || '#'}
+                href={page?.href || "#"}
                 className="text-white/70 hover:text-[#67FF56] transition"
               >
-                {page.name}
+                {page?.name }
               </Link>
             ))}
           </div>
