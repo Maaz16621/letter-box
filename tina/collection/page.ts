@@ -85,7 +85,7 @@ const Page: Collection = {
       type: 'boolean',
       name: 'noindex',
       label: 'No‑index?',
-      ui:   { description: 'Adds <meta name="robots" content="noindex" /> when checked' },
+      ui:   { description: 'Adds <meta name="robots" content="noindex, nofollow" /> when checked' },
     },
 
     /* -------- Open Graph (Facebook, LinkedIn…) -------- */

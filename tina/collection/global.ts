@@ -117,6 +117,24 @@ const Global: Collection = {
             },
           ],
         },
+        {
+          type: "object",
+          label: "Pages",
+          name: "pages",
+          list: true,
+          fields: [
+            {
+              type: "string",
+              label: "Name",
+              name: "name",
+            },
+            {
+              type: "string",
+              label: "Link",
+              name: "href",
+            },
+          ],
+        },
       ],
     },
     {

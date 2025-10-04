@@ -8,13 +8,6 @@ export const Footer = () => {
   const { globalSettings } = useLayout();
   const { header, footer } = globalSettings!;
 
-  const pages = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-    { name: "FAQ", href: "/faq" },
-  ];
-
   return (
     <footer className="px-6 text-white bg-transparent">
       <div className="max-w-5xl mx-auto px-6 text-center ">
@@ -62,7 +55,7 @@ export const Footer = () => {
 
           {/* Right - Page links */}
           <div className="flex flex-wrap justify-center md:justify-end gap-4">
-            {pages.map((page, index) => (
+            {footer?.pages?.map((page, index) => (
               <Link
                 key={index}
                 href={page.href}

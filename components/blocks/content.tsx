@@ -13,8 +13,13 @@ import { scriptCopyBlockSchema, ScriptCopyBtn } from "../magicui/script-copy-btn
 export const Content = ({ data }: { data: PageBlocksContent }) => {
   return (
     <Section background={data.background!}
-      className="prose prose-lg"
+      className={`prose prose-lg mt-16 ${
+        data.color === 'white' ? 'prose-invert' : ''
+      }`}
       data-tina-field={tinaField(data, "body")}
+      style={{
+        color: data.color as any,
+      }}
     >
       <TinaMarkdown
         content={data.body}
@@ -27,6 +32,8 @@ export const Content = ({ data }: { data: PageBlocksContent }) => {
   );
 };
 
+import { ColorPickerInput } from "../../tina/fields/color";
+
 export const contentBlockSchema: Template = {
   name: "content",
   label: "Content",
@@ -34,10 +41,19 @@ export const contentBlockSchema: Template = {
     previewSrc: "/blocks/content.png",
     defaultItem: {
       body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.",
+      color: "white",
     },
   },
   fields: [
     sectionBlockSchemaField as any,
+    {
+      type: "string",
+      label: "Color",
+      name: "color",
+      ui: {
+        component: ColorPickerInput,
+      },
+    },
     {
       type: "rich-text",
       label: "Body",
