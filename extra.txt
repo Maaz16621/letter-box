@@ -1,8 +1,30 @@
-letterboxedsolver.info
-Valid Configuration
-Production
-Depending on your provider, it might take some time for the DNS records to propagate globally. Learn More
-
-letter-box-six.vercel.app
-Valid Configuration
-dependabot/npm_and_yarn/tinacms/cl
+ 
+Failed to compile.
+19:01:28.719 
+19:01:28.719 
+./components/layout/nav/footer.tsx:61:17
+19:01:28.719 
+Type error: Type 'string | null | undefined' is not assignable to type 'Url'.
+19:01:28.719 
+  Type 'undefined' is not assignable to type 'Url'.
+19:01:28.720 
+19:01:28.720 
+  59 |               <Link
+19:01:28.720 
+  60 |                 key={index}
+19:01:28.720 
+> 61 |                 href={page.href}
+19:01:28.720 
+     |                 ^
+19:01:28.720 
+  62 |                 className="text-white/70 hover:text-[#67FF56] transition"
+19:01:28.720 
+  63 |               >
+19:01:28.720 
+  64 |                 {page.name}
+19:01:28.753 
+Next.js build worker exited with code: 1 and signal: null
+19:01:28.778 
+ ELIFECYCLE  Command failed with exit code 1.
+19:01:28.796 
+Error: Command "pnpm run build" exited with 1

@@ -58,7 +58,7 @@ export const Footer = () => {
             {footer?.pages?.map((page, index) => (
               <Link
                 key={index}
-                href={page.href}
+                href={page.href || '#'}
                 className="text-white/70 hover:text-[#67FF56] transition"
               >
                 {page.name}
