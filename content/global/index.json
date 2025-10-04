@@ -19,10 +19,10 @@
     ],
     "buttonText": "Contact Us",
     "buttonColor": "#42CD42",
-    "buttonLink": "/"
+    "buttonLink": "/contact"
   },
   "footer": {
-    "subtext": "Unlock the potential of words at AIWordSolver — your wordhub for solving jumble puzzles, unscrambling letters, and dominating games like Wordle and Scrabble. Elevate your gameplay with our easy-to-use tools!",
+    "subtext": "Letter Boxed Solver helps you crack today’s puzzle faster with smart solutions, official game rules, and filtered word choices, making every challenge simpler, sharper, and more fun.",
     "social": [
       {
         "icon": {
