@@ -75,6 +75,6 @@
   "theme": {
     "color": "white",
     "font": "sans",
-    "darkMode": "dark"
+    "darkMode": "light"
   }
 }
