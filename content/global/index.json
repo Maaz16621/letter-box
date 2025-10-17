@@ -51,10 +51,6 @@
     ],
     "pages": [
       {
-        "name": "Terms & Conditions",
-        "href": "/terms-conditions"
-      },
-      {
         "name": "Blog",
         "href": "/blog"
       },
@@ -69,6 +65,10 @@
       {
         "name": "Privacy Policy",
         "href": "https://letterboxedsolver.info/privacy-policy"
+      },
+      {
+        "name": "Terms & Conditions",
+        "href": "/terms-conditions"
       }
     ]
   },
