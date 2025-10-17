@@ -181,3 +181,96 @@
   text-align: center;
   font-weight: 700;
 }
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose table td,
+.prose p strong,
+.prose p em,
+.prose li,
+.prose ol,
+
+.prose h6 {
+  color: white
+}
+
+.prose p {
+  color: white
+}
+
+.prose a {
+  color: white;
+}
+
+.prose blockquote {
+  color: white;
+  border-left-color: theme('colors.gray.200');
+}
+
+.prose code {
+  color: theme('colors.gray.900');
+}
+
+.prose pre {
+  background-color: theme('colors.gray.800');
+}
+
+.prose pre code {
+  color: theme('colors.gray.200');
+}
+
+.prose strong {
+  color: theme('colors.gray.900');
+}
+
+.prose ul > li::before {
+  background-color: theme('colors.gray.500');
+}
+
+.prose ol > li::before {
+  color: theme('colors.gray.500');
+}
+
+.prose hr {
+  border-color: theme('colors.gray.200');
+}
+
+/* Dark mode */
+.dark .prose h1,
+.dark .prose h2,
+.dark .prose h3,
+.dark .prose h4,
+.dark .prose h5,
+.dark .prose h6,
+.dark .prose p,
+.dark .prose a,
+.dark .prose blockquote,
+.dark .prose code,
+.dark .prose strong,
+.dark .prose em,
+.dark .prose ol > li::before {
+  color: theme('colors.white');
+}
+
+.dark .prose pre {
+  background-color: theme('colors.black');
+}
+
+.dark .prose pre code {
+  color: theme('colors.white');
+}
+
+.dark .prose ul > li::before {
+  background-color: theme('colors.white');
+}
+
+.dark .prose hr {
+  border-color: theme('colors.gray.700');
+}
+
+.dark .prose blockquote {
+  border-left-color: theme('colors.gray.700');
+}
