@@ -51,6 +51,10 @@
     ],
     "pages": [
       {
+        "name": "Terms & Conditions",
+        "href": "/terms-conditions"
+      },
+      {
         "name": "Blog",
         "href": "/blog"
       },
