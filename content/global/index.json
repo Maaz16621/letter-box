@@ -51,6 +51,10 @@
     ],
     "pages": [
       {
+        "name": "About",
+        "href": "/about"
+      },
+      {
         "name": "Privacy Policy",
         "href": "https://letterboxedsolver.info/privacy-policy"
       }
