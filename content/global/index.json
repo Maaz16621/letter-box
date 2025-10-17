@@ -55,12 +55,12 @@
         "href": "/blog"
       },
       {
-        "name": "Disclaimer",
-        "href": "/disclaimer"
-      },
-      {
         "name": "About",
         "href": "/about"
+      },
+      {
+        "name": "Disclaimer",
+        "href": "/disclaimer"
       },
       {
         "name": "Privacy Policy",
