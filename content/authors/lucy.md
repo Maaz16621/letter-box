@@ -1,5 +1,5 @@
 ---
-name: Lucy
-avatar: /uploads/authors/lucy.png
+name: Talha Zahid
+avatar: /uploads/authors/napoleon.png
 ---
 

@@ -32,7 +32,7 @@
       },
       {
         "icon": {
-          "name": "FaGithub"
+          "name": "BiLogoFacebookCircle"
         },
         "url": "https://github.com/tinacms/tinacms"
       },
@@ -51,12 +51,24 @@
     ],
     "pages": [
       {
+        "name": "Blog",
+        "href": "/blog"
+      },
+      {
         "name": "About",
         "href": "/about"
       },
       {
+        "name": "Disclaimer",
+        "href": "/disclaimer"
+      },
+      {
         "name": "Privacy Policy",
         "href": "https://letterboxedsolver.info/privacy-policy"
+      },
+      {
+        "name": "Terms & Conditions",
+        "href": "/terms-conditions"
       }
     ]
   },

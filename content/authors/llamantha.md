@@ -1,5 +1,5 @@
 ---
-name: Llamantha
-avatar: /uploads/authors/llamantha.png
+name: Farrukh Iftikhar
+avatar: /uploads/authors/pedro.png
 ---
 
