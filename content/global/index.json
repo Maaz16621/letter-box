@@ -1,6 +1,6 @@
 {
   "header": {
-    "logoText": "LETTER BOX SOLVER",
+    "logoText": "LETTER BOXED SOLVER",
     "logoImage": "https://assets.tina.io/2c7126f4-363d-43c0-808f-a891b5c8473a/logo/Clip%20path%20group.png",
     "color": "#FFFFFF",
     "nav": [
@@ -13,7 +13,7 @@
         "label": "About"
       },
       {
-        "href": "/posts",
+        "href": "/blog",
         "label": "Blog"
       }
     ],
