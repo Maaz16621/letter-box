@@ -51,6 +51,10 @@
     ],
     "pages": [
       {
+        "name": "Disclaimer",
+        "href": "/disclaimer"
+      },
+      {
         "name": "About",
         "href": "/about"
       },
