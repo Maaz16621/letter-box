@@ -73,8 +73,8 @@
     ]
   },
   "theme": {
-    "color": "purple",
+    "color": "white",
     "font": "sans",
-    "darkMode": "dark"
+    "darkMode": "light"
   }
 }
