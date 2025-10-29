@@ -15,7 +15,7 @@ import { WhyChoose } from "./whyChoose";
 import { FaqSection } from "./faqSection";
 import { WorkingMechanism } from "./workingMechanisim";
 import { LetterBoxHowTo } from "./howTo";
-
+import { ContactBlock } from "./contact";
 export const Blocks = (props: Omit<Page, "id" | "_sys" | "_values">) => {
   if (!props.blocks) return null;
   return (
@@ -64,6 +64,8 @@ case "PageBlocksWorkingMechanism":
   return <WorkingMechanism data={block} />;
    case "PageBlocksLetterBoxHowTo":            // 👈 NEW CASE
       return <LetterBoxHowTo data={block} />;
+         case "PageBlocksContactBlock":            // 👈 NEW CASE
+      return <ContactBlock data={block} />;
 default:
       return null;
   }

@@ -16,7 +16,7 @@ import { whyChooseBlockSchema }     from '@/components/blocks/whyChoose'
 import { faqBlockSchema }           from '@/components/blocks/faqSection'
 import { workingMechanismBlockSchema } from '@/components/blocks/workingMechanisim'
 import { letterBoxHowToBlockSchema }   from '@/components/blocks/howTo'
-
+import { contactBlockSchema } from '@/components/blocks/contact'
 const Page: Collection = {
   label:  'Pages',
   name:   'page',
@@ -50,6 +50,7 @@ const Page: Collection = {
         otherSolversBlockSchema,
         textSectionBlockSchema,
         whyChooseBlockSchema,
+        contactBlockSchema,
         keyFeaturesBlockSchema,
         faqBlockSchema,
         workingMechanismBlockSchema,
