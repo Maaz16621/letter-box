@@ -10,7 +10,7 @@ export const ContactBlock = ({ data }: { data: any }) => {
     <Section background={data?.background}>
       <div
         className={cn(
-          "relative grid h-full w-full max-w-6xl mx-auto text-white border bg-[#1A1A1A]/30 shadow-md md:grid-cols-2 lg:grid-cols-3 rounded-2xl overflow-hidden"
+          "relative grid h-full w-full max-w-6xl mx-auto mt-12 text-white border bg-[#1A1A1A]/30 shadow-md md:grid-cols-2 lg:grid-cols-3 rounded-2xl overflow-hidden"
         )}
       >
         {/* Decorative corners */}
