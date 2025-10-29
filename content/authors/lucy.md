@@ -1,5 +1,5 @@
 ---
 name: Talha Zahid
-avatar: /uploads/authors/napoleon.png
+avatar: /uploads/authors/unnamed.png
 ---
 
